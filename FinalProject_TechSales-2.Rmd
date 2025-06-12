@@ -1,0 +1,121 @@
+---
+title: "EBTM 350 final project"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+# Background or Introduction
+
+Remove me and write your interesting story in the first section. Labor market success has historically been linked with human capital aspects such as education and job training. There has also been interested in examining the impact of noncognitive factors such as workers’ sex, age, and personality trait. (Please carefully review my grading rubric. It has the instruction for the points assigned for each each section. You should have the required analyses and interpretation/explanation to earn the corresponding points. If any required analyses are missing, the points will be deducted.)
+
+## Exploratory analysis
+
+### 1. Exploring the range and distribution
+
+
+```{r}
+library(readxl)
+TechSales <- read_excel("TechSales.xlsx")
+summary(TechSales)
+```
+
+Write your rough exploratory analyses of the data (Remove me and write your own).
+
+```{r}
+hist(TechSales$Salary)
+hist(TechSales$Years)
+```
+
+Write your interpretation of the histogram of the variables that you want to emphasize (Remove me and write your own).
+
+```{r}
+table(TechSales$Female)
+table(TechSales$Business)
+```
+
+Write your interpretation of the frequency table of the variables that you want to emphasize (Remove me and write your own).
+
+### 2. Exploring the association between Earnings and other numerical variables
+
+```{r}
+# 2. Exploring the association between Salary and other numerical variables
+plot(TechSales$Salary ~ TechSales$Age)
+cor(TechSales$Salary, TechSales$Age)
+```
+
+Write your interpretation here (Remove me and write your own).
+
+### 3. Exploring the association between Earnings and categorical variables
+
+```{r}
+# 3. Exploring the association between Salary and categorical variables
+tapply(TechSales$Salary, TechSales$Female, mean) 
+
+boxplot(TechSales$Salary ~ TechSales$Female)
+```
+
+Write your interpretation here (Remove me and write your own).
+
+## Building models
+
+```{r}
+# Build simple models based on your intuition
+TechSales$Sales_Rep <- NULL 
+# If you want to predict salary
+SalaryModel1 <- lm(Salary ~ Age + Female + Years + College, data = TechSales)
+summary(SalaryModel1, digits = 3)
+
+
+# If you want to predict NPS
+NPSModel1 <- lm(NPS ~ Age + Female + Years + College , data = TechSales)
+summary(NPSModel1, digits = 3)
+
+```
+
+Write your interpretation here (Remove me and write your own).
+
+### Other models
+
+You should think about other models that you could develop. You could fit a few different models for the same response variable, then compare them with the previous one by using the goodness-of-fit R-squared measure to help you to choose the best one (Remove me and write your own).
+
+```{r}
+# A different one
+SalaryModelFull <- lm(Salary ~ ., data = TechSales)
+summary(SalaryModelFull, digits = 3)
+```
+
+
+### Advanced model development
+
+You should think about other models that you could develop. You could fit a few different models for the same response variable, then compare them with the previous one by using the goodness-of-fit R-squared measure to help you to choose the best one (Remove me and write your own).
+
+```{r}
+# Explore the nonlinear relationship betwee age and salary
+plot(TechSales$Salary ~ TechSales$Age)
+lines(lowess(TechSales$Age, TechSales$Salary), col = "blue")
+
+SalaryModel2 <- lm(Salary ~ Age + I(Age^2) + Female + Years + College, data = TechSales)
+summary(SalaryModel2, digits = 3)
+
+# Explore the interaction effect of gender and Experience on salary, you could explore others
+# Colored scatter plot
+plot(TechSales$Salary~TechSales$Years, 
+     main="Scatterplot of Salary against Experience by gender",
+     xlab = "Experience", ylab = "Salary", 
+     pch=16, col=ifelse(TechSales$Female == 1, "blue", "red")) 
+
+legend("topright",
+       legend=c("Female", "Male"), pch=16, col=c("blue", "red")) 
+
+# A potential model with interaction term
+SalaryModel_inter <- lm(Salary ~ . + Years*Female, data = TechSales)
+
+summary(SalaryModel_inter, digits = 3)
+```
+
+## Interpreting models
+
+Read the instruction and provide the comparison, summary, and/or conclusion. 
